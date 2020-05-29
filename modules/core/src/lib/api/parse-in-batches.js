@@ -9,6 +9,7 @@ import {selectLoader} from './select-loader';
 
 // Ensure `parse` is available in context if loader falls back to `parse`
 import {parse} from './parse';
+import {isReadableStream, isResponse} from '@loaders.gl/core/javascript-utils/is-type';
 
 export async function parseInBatches(data, loaders, options, context) {
   assert(!context || typeof context !== 'string', 'parseInBatches no longer accepts final url');
