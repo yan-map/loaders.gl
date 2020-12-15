@@ -41,15 +41,15 @@
     "@loaders.gl/core": "3.0.0-alpha.1",
     "@loaders.gl/crypto": "3.0.0-alpha.1",
     "@loaders.gl/draco": "3.0.0-alpha.1",
+    "@loaders.gl/gltf": "3.0.0-alpha.1",
     "@loaders.gl/i3s": "3.0.0-alpha.1",
+    "@loaders.gl/images": "3.0.0-alpha.1",
+    "@loaders.gl/loader-utils": "3.0.0-alpha.1",
     "@loaders.gl/polyfills": "3.0.0-alpha.1",
     "@loaders.gl/tiles": "3.0.0-alpha.1",
-    "@loaders.gl/loader-utils": "3.0.0-alpha.1",
-    "@loaders.gl/gltf": "3.0.0-alpha.1",
-    "@loaders.gl/images": "3.0.0-alpha.1",
     "@math.gl/core": "^3.3.0",
-    "@math.gl/geospatial": "^3.3.0",
     "@math.gl/culling": "^3.3.0",
+    "@math.gl/geospatial": "^3.3.0",
     "archiver": "^5.0.0",
     "cors": "^2.8.5",
     "crypt": "^0.0.2",
@@ -60,6 +60,7 @@
     "jszip": "^3.5.0",
     "md5": "^2.3.0",
     "morgan": "~1.9.1",
+    "probe.gl": "^3.3.0",
     "uuid": "^8.1.0"
   }
 }

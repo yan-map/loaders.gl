@@ -15,11 +15,11 @@ export function calculateFilesSize(params: {
   slpk: boolean;
   outputPath: string;
   tilesetName: string;
-}): Number;
+}): String;
 
 /**
  * Reqursivelly calculate files sizes in directory.
  * @param dirPath - Directory path.
  * @returns Promise with files size in directory.
  */
-export function getTotalFilesSize(dirPath: string): Number;
+export function getTotalFilesSize(dirPath: string): String;

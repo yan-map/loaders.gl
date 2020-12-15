@@ -1,6 +1,5 @@
-/* global console, process */
-/* eslint-disable no-console */
-const {I3SConverter, Tiles3DConverter} = require('@loaders.gl/tile-converter');
+/* global process */
+const {I3SConverter, Tiles3DConverter, probe} = require('@loaders.gl/tile-converter');
 import '@loaders.gl/polyfills';
 
 const TILESET_TYPE = {
@@ -9,35 +8,36 @@ const TILESET_TYPE = {
 };
 
 function printHelp() {
-  console.log('cli: converter 3dTiles to I3S or I3S to 3dTiles...');
-  console.log(
+  probe.showMessage('cli: converter 3dTiles to I3S or I3S to 3dTiles...');
+  probe.showMessage(
     '--max-depth [Maximal depth of hierarchical tiles tree traversal, default: infinite]'
   );
-  console.log('--name [Tileset name]');
-  console.log('--output [Output folder, default: "data" folder]');
-  console.log('--slpk [Generate slpk (Scene Layer Packages) I3S output file]');
-  console.log(
+  probe.showMessage('--name [Tileset name]');
+  probe.showMessage('--output [Output folder, default: "data" folder]');
+  probe.showMessage('--slpk [Generate slpk (Scene Layer Packages) I3S output file]');
+  probe.showMessage(
     '--tileset [tileset.json file (3DTiles) / http://..../SceneServer/layers/0 resource (I3S)]'
   );
-  console.log('--input-type [tileset input type: I3S or 3DTILES]');
-  console.log(
+  probe.showMessage('--input-type [tileset input type: I3S or 3DTILES]');
+  probe.showMessage(
     '--7zExe [location of 7z.exe archiver to create slpk on Windows, default: "C:\\Program Files\\7-Zip\\7z.exe"]'
   );
-  console.log(
+  probe.showMessage(
     '--egm [location of Earth Gravity Model *.pgm file to convert heights from ellipsoidal to gravity-related format. A model file can be loaded from GeographicLib https://geographiclib.sourceforge.io/html/geoid.html]'
   );
-  console.log('--token [Token for Cesium ION tilesets authentication]');
-  console.log('--no-draco [Disable draco compression for geometry]');
+  probe.showMessage('--token [Token for Cesium ION tilesets authentication]');
+  probe.showMessage('--no-draco [Disable draco compression for geometry]');
   process.exit(0); // eslint-disable-line
 }
 
 function validateOptions(options) {
   const mandatoryOptionsWithExceptions = {
-    name: () => console.log('Missed: --name [Tileset name]'),
-    tileset: () => console.log('Missed: --tileset [tileset.json file]'),
+    name: () => probe.showMessage('Missed: --name [Tileset name]'),
+    tileset: () => probe.showMessage('Missed: --tileset [tileset.json file]'),
     inputType: () =>
-      console.log('Missed/Incorrect: --input-type [tileset input type: I3S or 3DTILES]'),
-    egm: () => console.log('Missed: --egm [location of the Earth Gravitational Model *.pgm file]')
+      probe.showMessage('Missed/Incorrect: --input-type [tileset input type: I3S or 3DTILES]'),
+    egm: () =>
+      probe.showMessage('Missed: --egm [location of the Earth Gravitational Model *.pgm file]')
   };
   const exceptions = [];
   for (const mandatoryOption in mandatoryOptionsWithExceptions) {
@@ -76,9 +76,9 @@ main();
 
 // eslint-disable-next-line no-shadow
 async function convert(options) {
-  console.log(`------------------------------------------------`); // eslint-disable-line
-  console.log(`Starting conversion of ${options.inputType}`); // eslint-disable-line
-  console.log(`------------------------------------------------`); // eslint-disable-line
+  probe.showMessage(`------------------------------------------------`); // eslint-disable-line
+  probe.showMessage(`Starting conversion of ${options.inputType}`); // eslint-disable-line
+  probe.showMessage(`------------------------------------------------`); // eslint-disable-line
   const inputType = options.inputType.toUpperCase();
   switch (inputType) {
     case TILESET_TYPE.I3S:
@@ -173,7 +173,7 @@ function parseOptions(args) {
           printHelp();
           break;
         default:
-          console.warn(`Unknown option ${arg}`);
+          probe.showWarning(`Unknown option ${arg}`);
           process.exit(0); // eslint-disable-line
       }
     }

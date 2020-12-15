@@ -7,6 +7,7 @@ import {ChildProcessProxy} from '@loaders.gl/loader-utils';
 import JSZip from 'jszip';
 import {MD5HashTransform} from '@loaders.gl/crypto';
 import crypt from 'crypt';
+import {probe} from '../utils/logging-util';
 
 export function compressFileWithGzip(pathFile) {
   const compressedPathFile = `${pathFile}.gz`;
@@ -16,11 +17,11 @@ export function compressFileWithGzip(pathFile) {
 
   return new Promise((resolve, reject) => {
     input.on('end', () => {
-      console.log(`${compressedPathFile} compressed and saved.`); // eslint-disable-line no-undef,no-console
+      probe.showMessage(`${compressedPathFile} compressed and saved.`); // eslint-disable-line no-undef,no-console
       resolve(compressedPathFile);
     });
     input.on('error', error => {
-      console.log(`${compressedPathFile}: compression error!`); // eslint-disable-line no-undef,no-console
+      probe.showError(`${compressedPathFile}: compression error!`); // eslint-disable-line no-undef,no-console
       reject(error);
     });
     input.pipe(gzip).pipe(output);
@@ -44,8 +45,8 @@ export async function compressFilesWithZip(fileMap, outputFile, level = 0) {
     // listen for all archive data to be writte
     // 'close' event is fired only when a file descriptor is involved
     output.on('close', function() {
-      console.log(`${outputFile} saved.`); // eslint-disable-line no-undef,no-console
-      console.log(`${archive.pointer()} total bytes`); // eslint-disable-line no-undef,no-console
+      probe.showMessage(`${outputFile} saved.`); // eslint-disable-line no-undef,no-console
+      probe.showMessage(`${archive.pointer()} total bytes`); // eslint-disable-line no-undef,no-console
       resolve();
     });
 
@@ -53,13 +54,13 @@ export async function compressFilesWithZip(fileMap, outputFile, level = 0) {
     // It is not part of this library but rather from the NodeJS Stream API.
     // @see: https://nodejs.org/api/stream.html#stream_event_end
     output.on('end', function() {
-      console.log('Data has been drained'); // eslint-disable-line no-undef,no-console
+      probe.showMessage('Data has been drained'); // eslint-disable-line no-undef,no-console
       resolve();
     });
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors)
     archive.on('warning', function(err) {
-      console.log(err); // eslint-disable-line no-undef,no-console
+      probe.showWarning(err); // eslint-disable-line no-undef,no-console
       reject(err);
     });
 
@@ -159,11 +160,11 @@ export async function generateHash128FromZip(inputZipFile, outputFile) {
   const output = createWriteStream(outputFile);
   return new Promise((resolve, reject) => {
     output.on('close', function() {
-      console.log(`${outputFile} generated and saved`); // eslint-disable-line
+      probe.showMessage(`${outputFile} generated and saved`); // eslint-disable-line
       resolve();
     });
     output.on('error', function(err) {
-      console.log(err); // eslint-disable-line
+      probe.showError(err); // eslint-disable-line
       reject(err);
     });
     for (const key in hashTable) {
@@ -186,15 +187,15 @@ function _longToByteArray(long) {
 
 export async function addFileToZip(inputFolder, fileName, zipFile, sevenZipExe) {
   await compressWithChildProcess(inputFolder, zipFile, 0, fileName, sevenZipExe);
-  console.log(`${fileName} added to ${zipFile}.`); // eslint-disable-line
+  probe.showMessage(`${fileName} added to ${zipFile}.`); // eslint-disable-line
 }
 
 function appendFileToArchive(archive, subFileName, subFileData) {
   return new Promise(resolve => {
     const fileStream = createReadStream(subFileData);
-    console.log(`Compression start: ${subFileName}`); // eslint-disable-line no-undef,no-console
+    probe.showMessage(`Compression start: ${subFileName}`); // eslint-disable-line no-undef,no-console
     fileStream.on('close', () => {
-      console.log(`Compression finish: ${subFileName}`); // eslint-disable-line no-undef,no-console
+      probe.showMessage(`Compression finish: ${subFileName}`); // eslint-disable-line no-undef,no-console
       resolve();
     });
     archive.append(fileStream, {name: subFileName});

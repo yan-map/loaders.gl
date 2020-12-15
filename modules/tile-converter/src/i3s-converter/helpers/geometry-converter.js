@@ -9,6 +9,7 @@ import {concatenateArrayBuffers, concatenateTypedArrays} from '@loaders.gl/loade
 import draco3d from 'draco3d';
 import md5 from 'md5';
 import {generateAttributes} from './geometry-attributes';
+import {probe} from '../../lib/utils/logging-util';
 
 const VALUES_PER_VERTEX = 3;
 const VALUES_PER_TEX_COORD = 2;
@@ -438,8 +439,7 @@ function convertMaterial(tileContent) {
     return {};
   }
   if (sourceMaterials.length > 1) {
-    // eslint-disable-next-line no-console, no-undef
-    console.warn(
+    probe.showWarning(
       `Warning: 3D tile contains multiple materials, only the first material was converted`
     );
   }

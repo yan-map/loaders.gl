@@ -1,6 +1,7 @@
 import {promises as fs} from 'fs';
 import {join} from 'path';
 import {compressFileWithGzip} from './compress-util';
+import {probe} from './logging-util';
 
 export async function writeFile(path, data, fileName = 'index.json') {
   await fs.mkdir(path, {recursive: true});
@@ -10,7 +11,7 @@ export async function writeFile(path, data, fileName = 'index.json') {
   } catch (err) {
     throw err;
   }
-  console.log(`${pathFile} saved.`); // eslint-disable-line
+  probe.showMessage(`${pathFile} saved.`); // eslint-disable-line
   return pathFile;
 }
 

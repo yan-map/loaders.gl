@@ -7,6 +7,7 @@ import process from 'process';
 import transform from 'json-map-transform';
 import md5 from 'md5';
 import draco3d from 'draco3d';
+import {probe} from '../lib/utils/logging-util';
 
 import NodePages from './helpers/node-pages';
 import {writeFile, removeDir, writeFileForSlpk} from '../lib/utils/file-utils';
@@ -81,10 +82,9 @@ export default class I3SConverter {
   }) {
     this.conversionStartTime = process.hrtime();
     this.options = {maxDepth, slpk, sevenZipExe, egmFilePath, draco, token, inputUrl};
-
-    console.log('Loading egm file...'); // eslint-disable-line
+    probe.showMessage('Loading egm file...');
     this.geoidHeightModel = await load(egmFilePath, PGMLoader);
-    console.log('Loading egm file completed!'); // eslint-disable-line
+    probe.showMessage('Loading egm file completed!');
 
     if (slpk) {
       this.nodePages.useWriteFunction(writeFileForSlpk);
@@ -238,9 +238,9 @@ export default class I3SConverter {
         );
       } catch (error) {
         if (error.code === FS_FILE_TOO_LARGE) {
-          console.warn(`${slpkFileName} file is too big to generate a hash`); // eslint-disable-line
+          probe.showWarning(`${slpkFileName} file is too big to generate a hash`);
         } else {
-          console.error(error); // eslint-disable-line
+          probe.showError(error);
         }
       }
       // All converted files are contained in slpk now they can be deleted
@@ -284,7 +284,7 @@ export default class I3SConverter {
         childNodes.push(child);
       }
       if (sourceTile.id) {
-        console.log(sourceTile.id); // eslint-disable-line
+        probe.showMessage(sourceTile.id);
       }
     }
   }
@@ -715,13 +715,17 @@ export default class I3SConverter {
     const filesSize = await calculateFilesSize(params);
     const diff = process.hrtime(this.conversionStartTime);
     const conversionTime = timeConverter(diff);
-    console.log(`------------------------------------------------`); // eslint-disable-line no-undef, no-console
-    console.log(`Finishing conversion of ${_3D_TILES}`); // eslint-disable-line no-undef, no-console
-    console.log(`Total conversion time: ${conversionTime}`); // eslint-disable-line no-undef, no-console
-    console.log(`Vertex count: `, this.vertexCounter); // eslint-disable-line no-undef, no-console
-    console.log(`File(s) size: `, filesSize, ' bytes'); // eslint-disable-line no-undef, no-console
-    console.log(`Percentage of tiles with "ADD" refinement type:`, addRefinementPercentage, '%'); // eslint-disable-line no-undef, no-console
-    console.log(`------------------------------------------------`); // eslint-disable-line no-undef, no-console
+    const statisticsTable = {
+      'Conversion statistics': {
+        'Total conversion time': conversionTime,
+        'Vertex count': this.vertexCounter,
+        'File(s) size': filesSize,
+        'Percentage of tiles with "ADD" refinement type': `${addRefinementPercentage}%`
+      }
+    };
+
+    probe.showMessage(`Finishing conversion of ${_3D_TILES}`);
+    probe.showTable(statisticsTable);
   }
 
   /**
@@ -752,7 +756,7 @@ export default class I3SConverter {
     this.sourceTileset.options = {...this.sourceTileset.options, ...options};
     if (options.headers) {
       this.sourceTileset.fetchOptions.headers = options.headers;
-      console.log('Authorization Bearer token has been updated'); // eslint-disable-line no-undef, no-console
+      probe.showMessage('Authorization Bearer token has been updated');
     }
     if (options.token) {
       this.sourceTileset.fetchOptions.token = options.token;
@@ -767,7 +771,7 @@ export default class I3SConverter {
 
     if (tile.refine === ADD_TILE_REFINEMENT) {
       this.refinementCounter.tilesWithAddRefineCount += 1;
-      console.warn('This tile uses "ADD" type of refinement'); // eslint-disable-line
+      probe.showWarning('This tile uses "ADD" type of refinement');
     }
 
     this.refinementCounter.tilesCount += 1;

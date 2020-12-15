@@ -38,11 +38,11 @@ export async function calculateFilesSize(params) {
   if (slpk) {
     const slpkPath = join(process.cwd(), outputPath, `${tilesetName}.slpk`);
     const stat = await fs.stat(slpkPath);
-    return stat.size;
+    return `${stat.size} bytes`;
   }
   const directoryPath = join(process.cwd(), outputPath, tilesetName);
   const totalSize = await getTotalFilesSize(directoryPath);
-  return totalSize;
+  return `${totalSize} bytes`;
 }
 
 async function getTotalFilesSize(dirPath) {

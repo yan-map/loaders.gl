@@ -37,7 +37,7 @@ async function cleanUpPath(testPath) {
   }
 }
 
-test('cli - Converters#converts 3d-tiles tileset to i3s tileset', async t => {
+test.only('cli - Converters#converts 3d-tiles tileset to i3s tileset', async t => {
   if (!isBrowser) {
     const converter = new I3SConverter();
     const tilesetJson = await converter.convert({
