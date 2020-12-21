@@ -1,5 +1,5 @@
 /* global document */
-import {load} from '@loaders.gl/core';
+import {load, selectLoader} from '@loaders.gl/core';
 import {BasisLoader, _CompressedTextureLoader} from '@loaders.gl/basis';
 import {ImageLoader} from '@loaders.gl/images';
 
@@ -9,7 +9,6 @@ canvas.height = 256;
 canvas.style.display = 'block';
 
 const gl = canvas.getContext('webgl');
-
 const loadOptions = {basis: {}, image: {decode: true, type: 'image'}};
 
 // TODO - build in auto detection of supported formats into `BasisLoader`
@@ -34,28 +33,50 @@ async function loadTextures() {
 
 async function loadTexture(texElem) {
   const path = texElem.getAttribute('tex-src');
-  const result = await load(
-    path,
-    [BasisLoader, ImageLoader, _CompressedTextureLoader],
-    loadOptions
-  );
-  let image = null;
+  try {
+    const loader = await selectLoader(path, [_CompressedTextureLoader, BasisLoader, ImageLoader]);
+    const result = await load(path, loader, loadOptions);
 
-  if (!result) {
+    switch (loader.name) {
+      case 'CompressedTexture': {
+        renderCompresedTexture(textureRenderPogram, result);
+        break;
+      }
+      case 'Images': {
+        renderImageTexture(textureRenderPogram, result);
+        break;
+      }
+      case 'Basis': {
+        const basisTextures = result[0];
+        renderCompresedTexture(textureRenderPogram, basisTextures);
+        break;
+      }
+      default: {
+        renderNotSupportedTexture();
+      }
+    }
+  } catch (e) {
     renderNotSupportedTexture();
-  } else if (result[0]) {
-    image = result[0][0];
-  } else {
-    image = result;
   }
 
-  renderTexture(textureRenderPogram, image);
   const dataUrl = canvas.toDataURL();
   texElem.style.backgroundImage = `url(${dataUrl})`;
 }
 
-// TODO Implement handling different images types after loading!
-function renderTexture(program, image) {
+function renderImageTexture(program, image) {
+  gl.useProgram(program);
+  const texture = gl.createTexture();
+
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+function renderCompresedTexture(program, images) {
   gl.useProgram(program);
 
   if (!dxtSupported) {
@@ -65,21 +86,31 @@ function renderTexture(program, image) {
 
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
   try {
-    const {width, height, compressed, format, data} = image;
-    if (compressed) {
-      gl.compressedTexImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, data);
-    } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    for (let index = 0; index < images.length; ++index) {
+      const image = images[index];
+      const {width, height, data} = image;
+      // const ext = gl.getExtension('WEBGL_compressed_texture_etc');
+      // const test = ext.COMPRESSED_RGB8_ETC2;
+
+      gl.compressedTexImage2D(gl.TEXTURE_2D, index, 36196, width, height, 0, data);
     }
   } catch (e) {
     console.error('Error', e); // eslint-disable-line
     renderNotSupportedTexture();
+  }
+
+  if (images.length > 1) {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+  } else {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   }
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
