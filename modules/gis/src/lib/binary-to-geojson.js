@@ -63,12 +63,17 @@ function deduceReturnType(dataArray) {
 function parseFeatureCollection(dataArray) {
   const features = [];
   for (const data of dataArray) {
+    if (data.featureIds.value.length === 0) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
     let lastIndex = 0;
     let lastValue = data.featureIds.value[0];
 
     // Need to deduce start, end indices of each feature
     for (let i = 0; i < data.featureIds.value.length; i++) {
       const currValue = data.featureIds.value[i];
+      // eslint-disable-next-line max-depth
       if (currValue === lastValue) {
         // eslint-disable-next-line no-continue
         continue;
