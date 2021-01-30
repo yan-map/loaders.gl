@@ -1,5 +1,5 @@
 import {assert} from '@loaders.gl/loader-utils';
-import {isAsyncIterable, isReadableStream} from '../../javascript-utils/is-type';
+import {isAsyncIterable, isIterator, isReadableStream} from '../../javascript-utils/is-type';
 import {asyncIteratorToStream} from './async-iterator-to-stream';
 
 /**
@@ -13,8 +13,8 @@ import {asyncIteratorToStream} from './async-iterator-to-stream';
  * This function can e.g. be used to enable data sources that can only be read atomically
  * (such as `Blob` and `File` via `FileReader`) to still be parsed in batches.
  */
-export function makeReadableStream(data, options = {}) {
-  if (isAsyncIterable(data)) {
+export function makeStream(data, options = {}) {
+  if (isAsyncIterable(data) || isIterator(data)) {
     // Note: Converts string chunks to binary
     return asyncIteratorToStream.obj(data, options);
   }

@@ -1,6 +1,6 @@
 /* eslint-disable no-invalid-this */
 import test from 'tape-promise/tape';
-import {makeStream} from '@loaders.gl/core/iterator-utils/async-iterator-to-stream';
+import {makeStream} from '@loaders.gl/core';
 
 const getChunks = stream =>
   new Promise(resolve => {
@@ -49,7 +49,7 @@ test('asyncIteratorToStream#works with async iterators', async t => {
   t.end();
 });
 
-test('asyncIteratorToStream#works with async iterables', async t => {
+test.only('asyncIteratorToStream#works with async iterables', async t => {
   const data = [1, 2, 3];
   const asyncIterableObject = {
     [Symbol.asyncIterator]: () => makeIterator(data, true)

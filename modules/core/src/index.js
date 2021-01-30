@@ -23,8 +23,9 @@ export {loadInBatches} from './lib/api/load-in-batches';
 export {encode, encodeSync, encodeInBatches, encodeText, encodeURLtoURL} from './lib/api/encode';
 export {save, saveSync} from './lib/api/save';
 
-// ITERATOR UTILS
+// ITERATOR & STREAM UTILS
 export {makeIterator} from './iterator-utils/make-iterator/make-iterator';
+export {makeStream} from './iterator-utils/make-stream/make-stream';
 
 // CORE LOADERS
 export {NullLoader} from './null-loader';
