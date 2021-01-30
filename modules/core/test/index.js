@@ -1,7 +1,7 @@
 import './javascript-utils/is-type.spec';
 import './javascript-utils/text-encoder.spec';
 
-import './iterator-utils/async-iterator-to-stream.spec';
+import './iterator-utils/make-stream.spec';
 
 import './lib/utils/mime-type-utils.spec';
 import './lib/utils/resource-utils.spec';

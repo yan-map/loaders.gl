@@ -1,6 +1,6 @@
 /* eslint-disable no-invalid-this */
 import test from 'tape-promise/tape';
-import {asyncIteratorToStream} from '@loaders.gl/core/iterator-utils/async-iterator-to-stream';
+import {makeStream} from '@loaders.gl/core/iterator-utils/async-iterator-to-stream';
 
 const getChunks = stream =>
   new Promise(resolve => {
@@ -25,32 +25,36 @@ const makeIterator = (data, asynchronous = false) => {
 
 test('asyncIteratorToStream#works with sync iterators', async t => {
   const data = [1, 2, 3];
-  const stream = asyncIteratorToStream.obj(makeIterator(data));
+
+  const stream = makeStream(makeIterator(data));
   t.deepEquals(await getChunks(stream), data);
   t.end();
 });
 
 test('asyncIteratorToStream#works with sync iterables', async t => {
   const data = [1, 2, 3];
-  const stream = asyncIteratorToStream.obj({
+  const iterableObject = {
     [Symbol.iterator]: () => makeIterator(data)
-  });
+  };
+
+  const stream = makeStream(iterableObject);
   t.deepEquals(await getChunks(stream), data);
   t.end();
 });
 
 test('asyncIteratorToStream#works with async iterators', async t => {
   const data = [1, 2, 3];
-  const stream = asyncIteratorToStream.obj(makeIterator(data, true));
+  const stream = makeStream(makeIterator(data, true));
   t.deepEquals(await getChunks(stream), data);
   t.end();
 });
 
 test('asyncIteratorToStream#works with async iterables', async t => {
   const data = [1, 2, 3];
-  const stream = asyncIteratorToStream.obj({
+  const asyncIterableObject = {
     [Symbol.asyncIterator]: () => makeIterator(data, true)
-  });
+  };
+  const stream = makeStream(asyncIterableObject);
   t.deepEquals(await getChunks(stream), data);
   t.end();
 });

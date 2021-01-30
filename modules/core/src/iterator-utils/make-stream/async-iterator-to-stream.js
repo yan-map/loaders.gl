@@ -1,3 +1,4 @@
+/* eslint-disable */
 const {Readable} = require('readable-stream');
 
 function getSymbol(name) {
@@ -35,22 +36,25 @@ export function asyncIteratorToStream(iterable, options) {
   if (typeof iterable === 'function') {
     return function() {
       // @ts-ignore
-      return asyncIteratorToStream(iterable.apply(this, arguments), options);
+      // eslint-disable-next-line
+      const iterator = iterable.apply(this, arguments);
+      return asyncIteratorToStream(iterator, options);
     };
   }
 
   const {then} = iterable;
   if (typeof then === 'function') {
-    return then.call(iterable, iterable => asyncIteratorToStream(iterable, options));
+    return then.call(iterable, iterable_ => asyncIteratorToStream(iterable_, options));
   }
 
   const iterator = resolveToIterator(iterable);
   const isGenerator = 'return' in iterator;
   const readable = options instanceof Readable ? options : new Readable(options);
+
   if (isGenerator) {
     readable._destroy = async (error, cb) => {
       try {
-        await (error != null ? iterator.throw(error) : iterator.return());
+        await (error !== null ? iterator.throw(error) : iterator.return());
       } catch (error) {
         return cb(error);
       }
