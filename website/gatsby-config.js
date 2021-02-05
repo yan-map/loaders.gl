@@ -95,12 +95,12 @@ module.exports = {
             componentUrl: resolve(__dirname, '../examples/website/textures/app.js'),
             path: 'examples/textures'
           },
-          {
-            title: 'glTF Helmet',
-            image: 'images/example-gltf.jpg',
-            componentUrl: resolve(__dirname, './templates/example-gltf.jsx'),
-            path: 'examples/gltf'
-          },
+          // {
+          //   title: 'glTF Helmet',
+          //   image: 'images/example-gltf.jpg',
+          //   componentUrl: resolve(__dirname, './templates/example-gltf.jsx'),
+          //   path: 'examples/gltf'
+          // },
           {
             title: '3D Tiles (Melbourne)',
             image: 'images/example-3d-tiles.png',
