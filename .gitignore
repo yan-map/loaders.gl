@@ -14,7 +14,7 @@ node_modules/
 npm-debug.log
 stats.json
 package-lock.json
-*/**/yarn.lock
+examples/**/yarn.lock
 yarn-error.log
 
 # Misc files
