@@ -36,6 +36,10 @@ export default class WorkerFarm {
     this.reuseWorkers = reuseWorkers;
   }
 
+  destroy() {
+    this.workerPools.forEach(workerPool => workerPool.destroy());
+  }
+
   setProps(props) {
     if ('maxConcurrency' in props) {
       this.maxConcurrency = props.maxConcurrency;
@@ -48,10 +52,6 @@ export default class WorkerFarm {
     if ('reuseWorkers' in props) {
       this.reuseWorkers = props.reuseWorkers;
     }
-  }
-
-  destroy() {
-    this.workerPools.forEach(workerPool => workerPool.destroy());
   }
 
   /**

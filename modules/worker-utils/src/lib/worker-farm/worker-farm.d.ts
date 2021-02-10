@@ -25,9 +25,9 @@ export default class WorkerFarm {
    */
   constructor(props: WorkerFarmProps);
 
-  setProps(props: object);
-
   destroy(): void;
+
+  setProps(props: object);
 
   /**
    * Process binary data in a worker

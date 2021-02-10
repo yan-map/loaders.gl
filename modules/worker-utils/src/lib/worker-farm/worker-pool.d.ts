@@ -24,6 +24,8 @@ export default class WorkerPool {
     reuseWorkers?: boolean
   });
 
+  destroy(): void;
+
   /**
    * Process binary data in a worker
    * @param data data (containing binary typed arrays) to be transferred to worker
@@ -31,6 +33,4 @@ export default class WorkerPool {
    * @returns a Promise with data (containing typed arrays) transferred back from worker
    */
   process(data: any, jobName?: string): Promise<any>;
-
-  destroy(): void;
 }
