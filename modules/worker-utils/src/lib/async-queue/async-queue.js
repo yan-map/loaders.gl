@@ -38,13 +38,6 @@ export default class AsyncQueue {
     this._closed = false;
   }
 
-  close() {
-    while (this._settlers.length > 0) {
-      this._settlers.dequeue().resolve({done: true});
-    }
-    this._closed = true;
-  }
-
   [Symbol.asyncIterator]() {
     return this;
   }
@@ -68,6 +61,15 @@ export default class AsyncQueue {
       this._values.enqueue(value);
     }
   }
+
+  close() {
+    while (this._settlers.length > 0) {
+      this._settlers.dequeue().resolve({done: true});
+    }
+    this._closed = true;
+  }
+
+  // ITERATOR IMPLEMENTATION
 
   /**
    * @returns a Promise for an IteratorResult

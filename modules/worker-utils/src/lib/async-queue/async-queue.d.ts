@@ -11,9 +11,9 @@ export function takeAsync(asyncIterable: AsyncIterable<any>, count?: number): Pr
 export default class AsyncQueue {
   constructor();
 
-  close(): void;
-
   [Symbol.asyncIterator](): AsyncIterator<any>;
+
+  close(): void;
 
   enqueue(value: any): void;
 

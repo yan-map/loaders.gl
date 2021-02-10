@@ -4,4 +4,8 @@ import {WorkerObject} from '../../types';
  * Creating such a worker can be automated if the worker is wrapper by a call to
  * createWorker in @loaders.gl/worker-utils.
  */
-export function processInBatches(worker: WorkerObject, data: any): Promise<any>;
+export function processInBatches(
+  worker: WorkerObject, 
+  iterator: AsyncIterable<ArrayBuffer>,
+  options?: object
+): AsyncIterator<ArrayBuffer>;
