@@ -1,10 +1,10 @@
-// TODO - remove
-import {getAccessorTypeFromSize, getComponentTypeFromArray} from './gltf-utils';
+/** @typedef {import('./gltf-attribute-utils')} types */
+/** @typedef {import('./gltf-schema').Accessor} GLTFAccessor */
+import {getAccessorTypeFromSize, getComponentTypeFromArray} from './gltf-utils'; // TODO - remove
 
-// Returns a fresh attributes object with glTF-standardized attributes names
-// Attributes that cannot be identified will not be included
-// Removes `indices` if present, as it should be stored separately from the attributes
+/** @type {types['getGLTFAccessors']} */
 export function getGLTFAccessors(attributes) {
+  /** @type {{[key: string]: GLTFAccessor}} */
   const accessors = {};
   for (const name in attributes) {
     const attribute = attributes[name];
@@ -16,11 +16,9 @@ export function getGLTFAccessors(attributes) {
   return accessors;
 }
 
-// Fix up a single accessor.
-// Input: typed array or a partial accessor object
-// Return: accessor object
-export function getGLTFAccessor(attribute, gltfAttributeName) {
-  const {buffer, size, count} = getAccessorData(attribute, gltfAttributeName);
+/** @type {types['getGLTFAccessor']} */
+export function getGLTFAccessor(attribute) {
+  const {buffer, size, count} = getAccessorData(attribute);
 
   const glTFAccessor = {
     // TODO: Deprecate `value` in favor of bufferView?
@@ -29,7 +27,7 @@ export function getGLTFAccessor(attribute, gltfAttributeName) {
 
     // glTF Accessor values
     // TODO: Instead of a bufferView index we could have an actual buffer (typed array)
-    bufferView: null,
+    bufferView: undefined,
     byteOffset: 0,
     count,
     type: getAccessorTypeFromSize(size),
@@ -39,11 +37,7 @@ export function getGLTFAccessor(attribute, gltfAttributeName) {
   return glTFAccessor;
 }
 
-export function getGLTFAttribute(data, gltfAttributeName) {
-  return data.attributes[data.glTFAttributeMap[gltfAttributeName]];
-}
-
-function getAccessorData(attribute, attributeName) {
+function getAccessorData(attribute) {
   let buffer = attribute;
   let size = 1;
   let count = 0;
