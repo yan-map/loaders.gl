@@ -25,7 +25,7 @@ export async function selectLoader(data, loaders = [], options = {}, context = {
   }
 
   // no loader available
-  if (!loader && !options.nothrow) {
+  if (!loader && !options.nothrow && data.status !== 204) {
     throw new Error(getNoValidLoaderMessage(data));
   }
 
@@ -52,7 +52,7 @@ export function selectLoaderSync(data, loaders = [], options = {}, context = {})
   loader = loader || findLoaderByExamingInitialData(loaders, data);
 
   // no loader available
-  if (!loader && !options.nothrow) {
+  if (!loader && !options.nothrow && data.status !== 204) {
     throw new Error(getNoValidLoaderMessage(data));
   }
 
