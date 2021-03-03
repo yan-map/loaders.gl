@@ -69,7 +69,7 @@ export default class I3SNodePagesTiles {
       }
 
       if (this.tileset.attributeStorageInfo) {
-        attributeUrls = generateTilesetAttributeUrls(this.tileset, node.mesh.material.resource);
+        attributeUrls = generateTilesetAttributeUrls(this.tileset, node.mesh.attribute.resource);
       }
     }
 

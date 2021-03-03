@@ -5,6 +5,7 @@ import {Tile3DLayer} from '@deck.gl/geo-layers';
 import MeshLayer from '../mesh-layer/mesh-layer';
 
 const SINGLE_DATA = [0];
+const EMPTY_VALUE = '';
 // Use our custom MeshLayer
 export default class TileLayer extends Tile3DLayer {
   _makeSimpleMeshLayer(tileHeader, oldLayer) {
@@ -52,22 +53,17 @@ export default class TileLayer extends Tile3DLayer {
 
     const {attributeStorageInfo} = tile.tileset.tileset;
     const {layerFeaturesAttributes} = tile.header.userData;
-    const featureAttributes = {};
-    let calculatedFeatureIndex = null;
+    const calculatedFeatureIndex = getFeatureAttributeIndex(layerFeaturesAttributes, featureId);
 
-    for (let index = 0; index < attributeStorageInfo.length; index++) {
-      const attributeName = attributeStorageInfo[index].name;
-      const attributeData = layerFeaturesAttributes[index][attributeName];
-      let attributeValue = '';
-
-      calculatedFeatureIndex =
-        calculatedFeatureIndex !== null ? calculatedFeatureIndex : attributeData.indexOf(featureId);
-      attributeValue = attributeData[calculatedFeatureIndex];
-      // eslint-disable-next-line no-control-regex
-      featureAttributes[attributeName] = attributeValue.toString().replace(/\u0000/g, '');
+    if (calculatedFeatureIndex < 0) {
+      return null;
     }
 
-    return featureAttributes;
+    return prepareFeatureAttributes(
+      attributeStorageInfo,
+      layerFeaturesAttributes,
+      calculatedFeatureIndex
+    );
   }
 }
 
@@ -87,4 +83,38 @@ function getMeshGeometry(contentAttributes) {
     attributes.featureIds = contentAttributes.featureIds;
   }
   return attributes;
+}
+
+function getFeatureAttributeIndex(layerFeaturesAttributes, featureId) {
+  let featureIndex = -1;
+
+  for (let index = 0; index < layerFeaturesAttributes.length; index++) {
+    const attribute = layerFeaturesAttributes[index];
+
+    if (attribute.hasOwnProperty('OBJECTID')) {
+      featureIndex = attribute.OBJECTID.indexOf(featureId);
+      break;
+    }
+  }
+
+  return featureIndex;
+}
+
+function prepareFeatureAttributes(attributeStorageInfo, layerFeaturesAttributes, featureIndex) {
+  const featureAttributes = {};
+
+  for (let index = 0; index < attributeStorageInfo.length; index++) {
+    const attributeName = attributeStorageInfo[index].name;
+    const attributeData = layerFeaturesAttributes[index][attributeName];
+    featureAttributes[attributeName] = formatAttributeValue(attributeData, featureIndex);
+  }
+
+  return featureAttributes;
+}
+
+function formatAttributeValue(attributeData, featureIndex) {
+  return attributeData && attributeData[featureIndex]
+    ? // eslint-disable-next-line no-control-regex
+      attributeData[featureIndex].toString().replace(/\u0000/g, '')
+    : EMPTY_VALUE;
 }

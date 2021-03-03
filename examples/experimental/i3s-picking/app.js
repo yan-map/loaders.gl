@@ -218,6 +218,10 @@ export default class App extends PureComponent {
       info.object,
       info.index
     );
+
+    if (!selectedFeatureAttributes) {
+      return null;
+    }
     // eslint-disable-next-line no-undef
     const tooltip = document.createElement('div');
     render(this.renderTooltip(selectedFeatureAttributes), tooltip);

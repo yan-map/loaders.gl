@@ -69,8 +69,14 @@ async function parseI3SNodeGeometry(arrayBuffer, tile = {}, options) {
   let vertexCount;
   let byteOffset = 0;
   let featureCount = 0;
+
   if (tile.isDracoGeometry) {
-    const decompressedGeometry = await parse(arrayBuffer, DracoLoader);
+    const decompressedGeometry = await parse(arrayBuffer, DracoLoader, {
+      parseOptions: {
+        attributeNameEntry: 'i3s-attribute-type'
+      }
+    });
+
     vertexCount = decompressedGeometry.header.vertexCount;
     const indices = decompressedGeometry.indices.value;
     const {
@@ -78,17 +84,20 @@ async function parseI3SNodeGeometry(arrayBuffer, tile = {}, options) {
       NORMAL,
       COLOR_0,
       TEXCOORD_0,
-      CUSTOM_ATTRIBUTE_3
+      ['feature-index']: featureIndex
     } = decompressedGeometry.attributes;
+
     attributes = {
       position: flattenAttribute(POSITION, indices),
       normal: flattenAttribute(NORMAL, indices),
       color: flattenAttribute(COLOR_0, indices),
       uv0: flattenAttribute(TEXCOORD_0, indices),
-      id: flattenAttribute(CUSTOM_ATTRIBUTE_3, indices)
+      id: flattenAttribute(featureIndex, indices)
     };
 
-    flattenFeatureIdsByFeatureIndices(attributes, tile);
+    if (featureIndex) {
+      flattenFeatureIdsByFeatureIndices(attributes, tile);
+    }
   } else {
     const {
       vertexAttributes,
@@ -140,9 +149,9 @@ async function parseI3SNodeGeometry(arrayBuffer, tile = {}, options) {
   };
 
   // Remove undefined attributes
-  for (const attributeIndex in content.attributes) {
-    if (!content.attributes[attributeIndex]) {
-      delete content.attributes[attributeIndex];
+  for (const attributeKey in content.attributes) {
+    if (!content.attributes[attributeKey]) {
+      delete content.attributes[attributeKey];
     }
   }
 
