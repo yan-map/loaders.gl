@@ -13,7 +13,7 @@ import {StatsWidget} from '@probe.gl/stats-widget';
 import {INITIAL_EXAMPLE_NAME, EXAMPLES} from './examples';
 import ControlPanel from './components/control-panel';
 import AttributesPanel from './components/attributes-panel';
-import AttributesTooltip from './components/attributes-tooltip';
+import AttributesTable from './components/attributes-table';
 import {parseTilesetUrlFromUrl, parseTilesetUrlParams} from './url-utils';
 
 import {INITIAL_MAP_STYLE} from './constants';
@@ -191,7 +191,7 @@ export default class App extends PureComponent {
 
     // eslint-disable-next-line no-undef
     const tooltip = document.createElement('div');
-    render(<AttributesTooltip data={selectedFeatureAttributes} />, tooltip);
+    render(<AttributesTable data={selectedFeatureAttributes} />, tooltip);
 
     return {html: tooltip.innerHTML};
   }

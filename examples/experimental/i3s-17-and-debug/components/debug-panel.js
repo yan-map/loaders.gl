@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faAngleDoubleLeft, faAngleDoubleRight} from '@fortawesome/free-solid-svg-icons';
 import DebugOptionGroup from './debug-option-group';
+import TilesInfoPanel from './tile-info-panel';
 
 const Container = styled.div`
   position: absolute;
@@ -15,7 +16,7 @@ const Container = styled.div`
 `;
 
 const DebugOptions = styled.div`
-  width: 300px;
+  width: 400px;
   min-width: 300px;
   height: calc(100% - 20px);
   overflow: auto;
@@ -58,10 +59,14 @@ const ChildWrapper = styled.div`
 
 const propTypes = {
   children: PropTypes.object,
-  onOptionsChange: PropTypes.func
+  selectedTiles: PropTypes.array,
+  onOptionsChange: PropTypes.func,
+  handleRemoveSelectedTile: PropTypes.func
 };
 
-const defaultProps = {};
+const defaultProps = {
+  selectedTiles: []
+};
 
 export default class DebugPanel extends PureComponent {
   constructor(props) {
@@ -102,7 +107,7 @@ export default class DebugPanel extends PureComponent {
       };
     }
     return {
-      marginLeft: '-300px',
+      marginLeft: '-400px',
       transition: 'margin-left 800ms'
     };
   }
@@ -116,8 +121,9 @@ export default class DebugPanel extends PureComponent {
   }
 
   render() {
-    const {children} = this.props;
+    const {children, selectedTiles, handleRemoveSelectedTile} = this.props;
     const {minimap} = this.state;
+
     return (
       <Container className="debug-panel">
         <DebugOptions style={this.getExpandStyles()}>
@@ -134,6 +140,11 @@ export default class DebugPanel extends PureComponent {
               <label htmlFor="showFrustumCullingMinimap">Show</label>
             </CheckboxOption>
           </DebugOptionGroup>
+          {Boolean(selectedTiles.length) && (
+            <DebugOptionGroup title="Selected Tiles">
+              <TilesInfoPanel tiles={selectedTiles} handleDeleteItem={handleRemoveSelectedTile} />
+            </DebugOptionGroup>
+          )}
           <ChildWrapper>{children}</ChildWrapper>
         </DebugOptions>
         <Expander onClick={this.toggleDebugPanel}>{this.renderExpandIcon()}</Expander>

@@ -5,20 +5,27 @@ const TH_STYLE = {
   textAlign: 'left'
 };
 
-const TOOLTIP_STYLE = {
+const DEFAULT_STYLE = {
   color: '#fff'
 };
+
 const NO_DATA = 'No Data';
 
 const propTypes = {
-  data: PropTypes.object
+  data: PropTypes.object,
+  style: PropTypes.object,
+  border: PropTypes.number
 };
 
 const defaultProps = {
-  data: {}
+  data: {},
+  style: null,
+  border: null
 };
 
-export default class AttributesTooltip extends PureComponent {
+const DEFAULT_TABLE_BORDER = 0;
+
+export default class AttributesTable extends PureComponent {
   prepareRows() {
     const {data} = this.props;
     const rows = [];
@@ -27,7 +34,7 @@ export default class AttributesTooltip extends PureComponent {
       const row = (
         <tr key={key}>
           <th style={TH_STYLE}>{key}</th>
-          <td>{this.formatTooltipValue(data[key])}</td>
+          <td>{this.formatValue(data[key])}</td>
         </tr>
       );
 
@@ -36,7 +43,7 @@ export default class AttributesTooltip extends PureComponent {
     return rows;
   }
 
-  formatTooltipValue(value) {
+  formatValue(value) {
     return (
       value
         .toString()
@@ -46,11 +53,12 @@ export default class AttributesTooltip extends PureComponent {
   }
 
   render() {
+    const {style, border} = this.props;
     const rows = this.prepareRows();
 
     return rows.length ? (
-      <div style={TOOLTIP_STYLE}>
-        <table>
+      <div style={style || DEFAULT_STYLE}>
+        <table border={border || DEFAULT_TABLE_BORDER} cellSpacing={0} cellPadding={3}>
           <tbody>{rows}</tbody>
         </table>
       </div>
@@ -58,5 +66,5 @@ export default class AttributesTooltip extends PureComponent {
   }
 }
 
-AttributesTooltip.propTypes = propTypes;
-AttributesTooltip.defaultProps = defaultProps;
+AttributesTable.propTypes = propTypes;
+AttributesTable.defaultProps = defaultProps;

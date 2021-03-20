@@ -18,8 +18,8 @@ import ControlPanel from './components/control-panel';
 import {INITIAL_MAP_STYLE, CONTRAST_MAP_STYLES, INITIAL_COLORING_MODE} from './constants';
 import {getFrustumBounds} from './frustum-utils';
 import TileLayer from './tile-layer/tile-layer';
-import AttributesTooltip from './components/attributes-tooltip';
-import {getTileDebugInfo} from './tile-debug';
+import AttributesTable from './components/attributes-table';
+import {getShortTileDebugInfo} from './tile-debug';
 import {parseTilesetUrlFromUrl, parseTilesetUrlParams} from './url-utils';
 
 const TRANSITION_DURAITON = 4000;
@@ -40,7 +40,7 @@ const STATS_WIDGET_STYLE = {
   wordBreak: 'break-word',
   padding: 12,
   zIndex: '10000',
-  maxWidth: 300,
+  maxWidth: 400,
   background: '#000',
   color: '#fff',
   alignSelf: 'flex-start'
@@ -94,10 +94,12 @@ export default class App extends PureComponent {
       selectedMapStyle: INITIAL_MAP_STYLE,
       debugOptions: {
         minimap: true
-      }
+      },
+      selectedTiles: []
     };
     this._onSelectTileset = this._onSelectTileset.bind(this);
     this._setDebugOptions = this._setDebugOptions.bind(this);
+    this.handleRemoveSelectedTile = this.handleRemoveSelectedTile.bind(this);
   }
 
   componentDidMount() {
@@ -250,7 +252,15 @@ export default class App extends PureComponent {
   }
 
   _renderDebugPanel() {
-    return <DebugPanel onOptionsChange={this._setDebugOptions}>{this._renderStats()}</DebugPanel>;
+    return (
+      <DebugPanel
+        selectedTiles={this.state.selectedTiles}
+        onOptionsChange={this._setDebugOptions}
+        handleRemoveSelectedTile={this.handleRemoveSelectedTile}
+      >
+        {this._renderStats()}
+      </DebugPanel>
+    );
   }
 
   _renderStats() {
@@ -287,12 +297,34 @@ export default class App extends PureComponent {
     if (!info.object || info.index < 0 || !info.layer) {
       return null;
     }
-    const tileInfo = getTileDebugInfo(info.object);
+    const tileInfo = getShortTileDebugInfo(info.object);
     // eslint-disable-next-line no-undef
     const tooltip = document.createElement('div');
-    render(<AttributesTooltip data={tileInfo} />, tooltip);
+    render(<AttributesTable data={tileInfo} />, tooltip);
 
     return {html: tooltip.innerHTML};
+  }
+
+  handleClick(info) {
+    if (!info.object) {
+      return;
+    }
+
+    this.addTileToSelectedTiles(info.object);
+  }
+
+  handleRemoveSelectedTile(removedTileId) {
+    const {selectedTiles} = this.state;
+    this.setState({selectedTiles: selectedTiles.filter(tile => tile.id !== removedTileId)});
+  }
+
+  addTileToSelectedTiles(selectedTile) {
+    const {selectedTiles} = this.state;
+    const isAlreadySelected = selectedTiles.some(tile => tile.id === selectedTile.id);
+
+    if (!isAlreadySelected) {
+      this.setState({selectedTiles: [...selectedTiles, selectedTile]});
+    }
   }
 
   render() {
@@ -311,6 +343,7 @@ export default class App extends PureComponent {
           onViewStateChange={this._onViewStateChange.bind(this)}
           onAfterRender={() => this._updateStatWidgets()}
           getTooltip={info => this.getTooltip(info)}
+          onClick={info => this.handleClick(info)}
         >
           {/* <StaticMap mapStyle={selectedMapStyle} preventStyleDiffing /> */}
           <StaticMap reuseMaps mapStyle={selectedMapStyle} preventStyleDiffing={true} />
