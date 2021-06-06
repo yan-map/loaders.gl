@@ -1,3 +1,5 @@
+import {GeoJsonProperties} from 'geojson';
+
 type TypedArray =
   | Int8Array
   | Uint8Array
@@ -13,10 +15,9 @@ export type BinaryAttribute = {value: TypedArray; size: number};
 export type BinaryGeometryType = 'Point' | 'LineString' | 'Polygon';
 
 type NumericProps = {[key: string]: BinaryAttribute};
-type Properties = object[];
 
 /**
- * Types for
+ * GIS category loader format
  */
 export type DataFormatGIS = {
   category: 'gis';
@@ -38,32 +39,41 @@ export type BinaryGeometryData = {
   type?: BinaryGeometryType;
 };
 
-/**
+/** GeoJSON point features in binary format */
+export type BinaryPointFeatures = {
+  positions: BinaryAttribute;
+  featureIds: BinaryAttribute;
+  globalFeatureIds: BinaryAttribute;
+  numericProps: NumericProps;
+  properties: GeoJsonProperties;
+}
+
+/** GeoJSON line features in binary format */
+export type BinaryLineFeatures = {
+  positions: BinaryAttribute;
+  pathIndices: BinaryAttribute;
+  featureIds: BinaryAttribute;
+  globalFeatureIds: BinaryAttribute;
+  numericProps: NumericProps;
+  properties: GeoJsonProperties;
+}
+
+/** GeoJSON line features in binary format */
+export type BinaryPolygonFeatures = {
+  positions: BinaryAttribute;
+  polygonIndices: BinaryAttribute;
+  primitivePolygonIndices: BinaryAttribute;
+  featureIds: BinaryAttribute;
+  globalFeatureIds: BinaryAttribute;
+  numericProps: NumericProps;
+  properties: GeoJsonProperties;
+}
+
+  /**
  * Represent a collection of Features, similar to a GeoJSON FeatureCollection
  */
-export type BinaryFeaturesData = {
-  points?: {
-    positions: BinaryAttribute;
-    featureIds: BinaryAttribute;
-    globalFeatureIds: BinaryAttribute;
-    numericProps: NumericProps;
-    properties: Properties;
-  };
-  lines?: {
-    positions: BinaryAttribute;
-    pathIndices: BinaryAttribute;
-    featureIds: BinaryAttribute;
-    globalFeatureIds: BinaryAttribute;
-    numericProps: NumericProps;
-    properties: Properties;
-  };
-  polygons?: {
-    positions: BinaryAttribute;
-    polygonIndices: BinaryAttribute;
-    primitivePolygonIndices: BinaryAttribute;
-    featureIds: BinaryAttribute;
-    globalFeatureIds: BinaryAttribute;
-    numericProps: NumericProps;
-    properties: Properties;
-  };
+export type BinaryFeatures = {
+  points?: BinaryPointFeatures;
+  lines?: BinaryLineFeatures;
+  polygons?: BinaryPolygonFeatures;
 };
