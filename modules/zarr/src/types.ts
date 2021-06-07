@@ -3,6 +3,40 @@ import type {DTYPE_VALUES} from './constants';
 export type SupportedDtype = keyof typeof DTYPE_VALUES;
 export type SupportedTypedArray = InstanceType<typeof globalThis[`${SupportedDtype}Array`]>;
 
+interface Multiscale {
+  datasets: {path: string}[];
+  version?: string;
+}
+
+interface Channel {
+  active: boolean;
+  color: string;
+  label: string;
+  window: {
+    min?: number;
+    max?: number;
+    start: number;
+    end: number;
+  };
+}
+
+interface Omero {
+  channels: Channel[];
+  rdefs: {
+    defaultT?: number;
+    defaultZ?: number;
+    model: string;
+  };
+  name?: string;
+}
+
+interface OmeAttrs {
+  multiscales: Multiscale[];
+  omero: Omero;
+}
+
+export type RootAttrs = {multiscales: Multiscale[]} | OmeAttrs;
+
 export interface PixelData {
   data: SupportedTypedArray;
   width: number;
