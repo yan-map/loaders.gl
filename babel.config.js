@@ -9,9 +9,7 @@ module.exports = (api) => {
       '@babel/plugin-proposal-optional-chaining',
       '@babel/plugin-proposal-nullish-coalescing-operator',
       // typescript supports class properties
-      '@babel/plugin-proposal-class-properties',
-      // inject __VERSION__ from package.json
-      'version-inline'
+      '@babel/plugin-proposal-class-properties'
     ],
     ignore: [
       // Don't transpile workers, they are transpiled separately
