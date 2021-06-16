@@ -29,12 +29,15 @@ interface Omero {
   name?: string;
 }
 
-interface OmeAttrs {
+interface MultiscaleAttrs {
   multiscales: Multiscale[];
+}
+
+interface OmeAttrs extends MultiscaleAttrs {
   omero: Omero;
 }
 
-export type RootAttrs = {multiscales: Multiscale[]} | OmeAttrs;
+export type RootAttrs = MultiscaleAttrs | OmeAttrs;
 
 export interface PixelData {
   data: SupportedTypedArray;
