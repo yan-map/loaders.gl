@@ -12,7 +12,7 @@ import type {
   TileSelection
 } from '../types';
 
-const DTYPE_LOOKUP = {
+export const DTYPE_LOOKUP = {
   u1: 'Uint8',
   u2: 'Uint16',
   u4: 'Uint32',

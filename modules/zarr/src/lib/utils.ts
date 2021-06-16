@@ -1,13 +1,12 @@
-import {openGroup} from 'zarr';
+import {openGroup, HTTPStore} from 'zarr';
 import type {ZarrArray} from 'zarr';
 import type {Store} from 'zarr/types/storage/types';
 
-import {FetchFileStore} from './storage';
 import type {PixelSource, RootAttrs, Labels} from '../types';
 
 export function normalizeStore(source: string | Store): Store {
   if (typeof source === 'string') {
-    return new FetchFileStore(source);
+    return new HTTPStore(source);
   }
   return source;
 }
